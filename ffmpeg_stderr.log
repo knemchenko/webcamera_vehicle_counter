@@ -1,0 +1,3 @@
+DeprecationWarning: The `openvino.runtime` module is deprecated and will be removed in the 2026.0 release. Please replace `openvino.runtime` with `openvino`.
+terminate called without an active exception
+terminate called without an active exception

@@ -1,0 +1,7 @@
+# Runtime dependencies (works with Python 3.12+)
+numpy
+opencv-python
+python-dotenv
+requests
+supervision
+openvino-dev
