@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment / secrets
+.env
+*.env
+
+# Runtime data / outputs
+*.db
+parking_state.json
+clips/
+_out/
+tests/_out/
+ffmpeg_stderr.log
+
+# OpenVINO Model Zoo artifacts
+omz_download/
+omz_ir/
+models/
+
+# Zone calibration (contains camera-specific coords, not shared)
+zone_polygon.json
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.bak
+

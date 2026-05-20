@@ -41,6 +41,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import datetime
 import subprocess
 import sys
 import threading
@@ -640,7 +641,6 @@ def format_caption(event: str, state: ParkingState) -> str:
     return (
         f"Подія: {event_ua}\n"
         f"Вільні місця: {state.free_spots}/{state.total_spots}\n"
-        f"Зайнято: {state.occupied_spots}"
     )
 
 
@@ -648,8 +648,7 @@ def format_caption(event: str, state: ParkingState) -> str:
 def format_status(state: ParkingState) -> str:
     """Short status text for non-event messages (startup/health)."""
     return (
-        f"Вільні місця: {state.free_spots}/{state.total_spots}\n"
-        f"Зайнято: {state.occupied_spots}"
+        f"Вільні місця: {state.free_spots}/{state.total_spots}"
     )
 
 def main() -> None:
@@ -721,6 +720,9 @@ def main() -> None:
     last_health = 0.0
     pending: Deque[PendingEvent] = deque()
 
+    # daily reset tracking
+    _last_reset_day: Optional[int] = None
+
     if cfg.telegram_token and cfg.telegram_chat_id:
         tg_send_text(cfg.telegram_token, cfg.telegram_chat_id, f"RTSP сервіс запущено.\n{format_status(state)}")
 
@@ -728,6 +730,27 @@ def main() -> None:
 
     while True:
         now = time.monotonic()
+
+        # --- Daily reset at 00:01 ---
+        _wall = datetime.datetime.now()
+        if _wall.hour == 0 and _wall.minute == 1:
+            today = _wall.toordinal()
+            if _last_reset_day != today:
+                _last_reset_day = today
+                new_st = ParkingState(
+                    total_spots=state.total_spots,
+                    free_spots=0,
+                    updated_ts=time.time(),
+                )
+                store.save_state(new_st)
+                state = new_st
+                log(f"[DAILY RESET] All spots marked busy: {state.free_spots}/{state.total_spots}")
+                if cfg.telegram_token and cfg.telegram_chat_id:
+                    tg_send_text(
+                        cfg.telegram_token,
+                        cfg.telegram_chat_id,
+                        f"🔄 Щоденне скидання (00:01) — всі місця зайняті\n{format_status(state)}",
+                    )
         frame, fts = grabber.get_latest()
         if frame is None:
             time.sleep(0.01)

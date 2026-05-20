@@ -72,7 +72,7 @@ class CounterConfig:
     min_person_box_height: int = 45
 
     # Global debounce between events of the same type (protects against track ID flicker)
-    global_event_cooldown_sec: float = 0.5
+    global_event_cooldown_sec: float = 0.25
 
     # Person suppression: if a 'vehicle' box overlaps a person box strongly, drop it
     suppress_person_iou: float = 0.45
